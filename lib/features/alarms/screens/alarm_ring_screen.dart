@@ -1,11 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:alarm/alarm.dart';
+import '../services/alarm_storage.dart';
+// This screen is only used for NORMAL alarms.
+// Walk alarms go directly to WalkChallengeScreen via main_navigation_screen.dart
 
 class AlarmRingScreen extends StatefulWidget {
   final AlarmSettings alarmSettings;
+  final String alarmType;
 
-  const AlarmRingScreen({super.key, required this.alarmSettings});
+  const AlarmRingScreen({
+    super.key,
+    required this.alarmSettings,
+    required this.alarmType,
+  });
 
   @override
   State<AlarmRingScreen> createState() => _AlarmRingScreenState();
@@ -22,12 +30,10 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
   void initState() {
     super.initState();
 
-    // Live clock
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() => _now = DateTime.now());
     });
 
-    // Pulse animation for stop button
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -67,6 +73,22 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
 
   Future<void> _stopAlarm() async {
     await Alarm.stop(widget.alarmSettings.id);
+
+    final alarms = AlarmStorage.alarms;
+
+    final index = alarms.indexWhere(
+          (alarm) => alarm.id == widget.alarmSettings.id,
+    );
+
+    if (index != -1) {
+      alarms[index] = alarms[index].copyWith(
+        isEnabled: false,
+      );
+
+      AlarmStorage.saveAlarms(alarms);
+      AlarmStorage.changeNotifier.notifyListeners();
+    }
+
     if (mounted) Navigator.pop(context);
   }
 
@@ -111,7 +133,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // ── Top section: time & date ──
+                // Top: time & date
                 Padding(
                   padding: const EdgeInsets.only(top: 60),
                   child: Column(
@@ -119,7 +141,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                       Text(
                         _timeString,
                         style: const TextStyle(
-                          fontSize: 72,
+                          fontSize: 65,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF3E2723),
                           letterSpacing: -2,
@@ -129,7 +151,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                       Text(
                         _dateString,
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 19,
                           color: Color(0xFF5D4037),
                           fontWeight: FontWeight.w500,
                         ),
@@ -139,7 +161,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.4),
+                          color: Colors.white.withOpacity(0.4),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Row(
@@ -163,10 +185,8 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                   ),
                 ),
 
-                // ── Middle: pineapple emoji ──
-                const Text('🍍', style: TextStyle(fontSize: 80)),
 
-                // ── Bottom: Stop & Snooze buttons ──
+                // Bottom: Stop & Snooze
                 Padding(
                   padding: const EdgeInsets.only(bottom: 60),
                   child: Column(
@@ -184,23 +204,29 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(0xFF3E2723)
-                                      .withValues(alpha: 0.4),
+                                      .withOpacity(0.4),
                                   blurRadius: 20,
                                   spreadRadius: 4,
                                 ),
                               ],
                             ),
-                            child: const Icon(Icons.close,
-                                color: Colors.white, size: 40),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 32,
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Text('Stop',
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF3E2723),
-                              fontWeight: FontWeight.bold)),
+                      const Text(
+                        "Stop",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF3E2723),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 30),
                       GestureDetector(
                         onTap: _snoozeAlarm,
@@ -208,7 +234,7 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 28, vertical: 14),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.5),
+                            color: Colors.white.withOpacity(0.5),
                             borderRadius: BorderRadius.circular(30),
                             border: Border.all(
                                 color: const Color(0xFFFFB300), width: 1.5),
@@ -219,11 +245,14 @@ class _AlarmRingScreenState extends State<AlarmRingScreen>
                               Icon(Icons.snooze,
                                   color: Color(0xFF3E2723), size: 20),
                               SizedBox(width: 8),
-                              Text('Snooze 5 mins',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF3E2723))),
+                              Text(
+                                'Snooze 5 mins',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF3E2723),
+                                ),
+                              ),
                             ],
                           ),
                         ),

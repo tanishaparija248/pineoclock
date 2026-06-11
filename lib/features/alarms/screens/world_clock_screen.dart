@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_analog_clock/flutter_analog_clock.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
-
-import '../models/world_clock_model.dart';
 import 'globe_screen.dart';
+import '../models/world_clock_model.dart';
 
 class WorldClockScreen extends StatefulWidget {
   const WorldClockScreen({super.key});
@@ -61,7 +60,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
 
     timer = Timer.periodic(
       const Duration(seconds: 1),
-          (_) {
+      (_) {
         setState(() {});
       },
     );
@@ -97,9 +96,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
     final location = tz.getLocation(timezone);
     final now = tz.TZDateTime.now(location);
 
-    return now.hour >= 6 && now.hour < 18
-        ? '☀️ Day'
-        : '🌙 Night';
+    return now.hour >= 6 && now.hour < 18 ? '☀️ Day' : '🌙 Night';
   }
 
   String getFlag(String city) {
@@ -120,24 +117,49 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
         return '🇦🇺';
       case 'Moscow':
         return '🇷🇺';
+      case 'Delhi':
+        return 'IN';
+
+      case 'Mumbai':
+        return 'IN';
+
+      case 'Beijing':
+        return 'CN';
+
+      case 'Berlin':
+        return 'DE';
+
+      case 'Rome':
+        return 'IT';
+
+      case 'Madrid':
+        return 'ES';
+
+      case 'Toronto':
+        return 'CA';
+
+      case 'Seoul':
+        return 'KR';
+
+      case 'Bangkok':
+        return 'TH';
+
+      case 'Istanbul':
+        return 'TR';
       default:
         return '🌍';
     }
   }
 
   String getTimeDifference(String timezone) {
-    final india =
-    tz.TZDateTime.now(tz.getLocation('Asia/Kolkata'));
+    final india = tz.TZDateTime.now(tz.getLocation('Asia/Kolkata'));
 
-    final city =
-    tz.TZDateTime.now(tz.getLocation(timezone));
+    final city = tz.TZDateTime.now(tz.getLocation(timezone));
 
-    final difference =
-        city.timeZoneOffset - india.timeZoneOffset;
+    final difference = city.timeZoneOffset - india.timeZoneOffset;
 
     final hours = difference.inHours;
-    final minutes =
-        difference.inMinutes.abs() % 60;
+    final minutes = difference.inMinutes.abs() % 60;
 
     if (hours == 0 && minutes == 0) {
       return 'Same as India';
@@ -161,7 +183,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
               title: Text(city.city),
               onTap: () {
                 if (!clocks.any(
-                      (c) => c.city == city.city,
+                  (c) => c.city == city.city,
                 )) {
                   setState(() {
                     clocks.add(city);
@@ -180,32 +202,37 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E1),
-
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
         title: const Text('World Clock'),
-        backgroundColor: Colors.transparent,
+        backgroundColor: const Color(0XFFF5F5F5),
         elevation: 0,
       ),
-
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           FloatingActionButton(
             heroTag: "globe",
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              final WorldClock? selectedCity = await Navigator.push<WorldClock>(
                 context,
                 MaterialPageRoute(
                   builder: (_) => const GlobeScreen(),
                 ),
               );
+
+              if (selectedCity != null &&
+                  !clocks.any(
+                    (c) => c.city == selectedCity.city,
+                  )) {
+                setState(() {
+                  clocks.add(selectedCity);
+                });
+              }
             },
             child: const Icon(Icons.public),
           ),
-
           const SizedBox(height: 12),
-
           FloatingActionButton(
             heroTag: "add",
             onPressed: showAddCitySheet,
@@ -213,11 +240,6 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
           ),
         ],
       ),
-
-
-
-
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -230,8 +252,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'India (Local Time)',
@@ -240,40 +261,30 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   Center(
                     child: SizedBox(
-                      height: 150,
-                      width: 150,
+                      height: 140,
+                      width: 140,
                       child: AnalogClock(),
                     ),
                   ),
-
                   const SizedBox(height: 16),
-
                   Text(
-                    DateFormat('hh:mm:ss a')
-                        .format(DateTime.now()),
+                    DateFormat('hh:mm:ss a').format(DateTime.now()),
                     style: const TextStyle(
-                      fontSize: 38,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
                   Text(
-                    DateFormat('EEEE, d MMM yyyy')
-                        .format(DateTime.now()),
+                    DateFormat('EEEE, d MMM yyyy').format(DateTime.now()),
                     style: const TextStyle(
                       fontSize: 14,
                     ),
                   ),
-
                   const SizedBox(height: 4),
-
                   const Text(
                     'GMT +5:30',
                     style: TextStyle(
@@ -283,9 +294,7 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
             Expanded(
               child: ListView.builder(
                 itemCount: clocks.length,
@@ -293,37 +302,30 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
                   final clock = clocks[index];
 
                   return Padding(
-                    padding:
-                    const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: GestureDetector(
                       onLongPress: () async {
-                        final remove =
-                        await showDialog<bool>(
+                        final remove = await showDialog<bool>(
                           context: context,
                           builder: (_) => AlertDialog(
-                            title:
-                            const Text('Remove City'),
+                            title: const Text('Remove City'),
                             content: Text(
                               'Remove ${clock.city} from World Clock?',
                             ),
                             actions: [
                               TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(
-                                      context,
-                                      false,
-                                    ),
-                                child:
-                                const Text('Cancel'),
+                                onPressed: () => Navigator.pop(
+                                  context,
+                                  false,
+                                ),
+                                child: const Text('Cancel'),
                               ),
                               TextButton(
-                                onPressed: () =>
-                                    Navigator.pop(
-                                      context,
-                                      true,
-                                    ),
-                                child:
-                                const Text('Remove'),
+                                onPressed: () => Navigator.pop(
+                                  context,
+                                  true,
+                                ),
+                                child: const Text('Remove'),
                               ),
                             ],
                           ),
@@ -336,72 +338,70 @@ class _WorldClockScreenState extends State<WorldClockScreen> {
                         }
                       },
                       child: Container(
-                        padding:
-                        const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color:
-                          const Color(0xFFFFD54F),
-                          borderRadius:
-                          BorderRadius.circular(
-                            16,
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+
+                          border: Border.all(
+                            color: const Color(0xFFFFB300),
+                            width: 1.5,
                           ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment
-                                  .spaceBetween,
                               children: [
+                                Text(
+                                  getFlag(clock.city),
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
-                                    '${getFlag(clock.city)} ${clock.city}',
-                                    style:
-                                    const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight:
-                                      FontWeight
-                                          .bold,
+                                    clock.city,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                                Text(
-                                  getTime(
-                                    clock.timezone,
-                                  ),
-                                  style:
-                                  const TextStyle(
-                                    fontSize: 20,
-                                    fontWeight:
-                                    FontWeight
-                                        .bold,
-                                  ),
-                                ),
                               ],
                             ),
-
-                            const SizedBox(
-                              height: 8,
+                            const SizedBox(height: 14),
+                            Text(
+                              getTime(clock.timezone),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-
-                            Row(
-                              children: [
-                                Text(
-                                  getGMT(
-                                    clock.timezone,
-                                  ),
-                                ),
-
-                                const SizedBox(
-                                  width: 12,
-                                ),
-
-                                Expanded(
-                                  child: Text(
-                                    '${getDayNight(clock.timezone)} • ${getTimeDifference(clock.timezone)}',
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(height: 8),
+                            Text(
+                              "${getDayNight(clock.timezone)} • ${getTimeDifference(clock.timezone)}",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              getGMT(clock.timezone),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Colors.black45,
+                              ),
                             ),
                           ],
                         ),

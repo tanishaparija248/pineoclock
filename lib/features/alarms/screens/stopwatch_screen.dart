@@ -70,7 +70,7 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E1),
+      backgroundColor:  Colors.white,
       appBar: AppBar(
         title: const Text("Stopwatch"),
         backgroundColor: Colors.transparent,
@@ -81,68 +81,80 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
         child: Column(
           children: [
             const Spacer(),
-
-            Text(
-              formatTime(stopwatch.elapsed),
-              style: const TextStyle(
-                fontSize: 42,
-                fontWeight: FontWeight.bold,
+            Center(
+              child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0XFFFAFAFA),
+                  border: Border.all(
+                    color: const Color(0xFFFFB300),
+                    width: 4,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                    Text(
+                      formatTime(stopwatch.elapsed),
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
 
             const SizedBox(height: 40),
 
-            Wrap(
-              alignment: WrapAlignment.center,
-              spacing: 0,
-              runSpacing: 1,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
+
+                ElevatedButton.icon(
                   onPressed: startPause,
+                  icon: Icon(
+                    stopwatch.isRunning
+                        ? Icons.pause
+                        : Icons.play_arrow,
+                  ),
+                  label: Text(
+                    stopwatch.isRunning
+                        ? "Pause"
+                        : "Start",
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFD54F),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                  ),
-                  child: Text(
-                    stopwatch.isRunning ? "Pause" : "Start",
-                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
 
-                const SizedBox(width: 10),
-
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: reset,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text("Reset"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFD54F),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
-                    ),
-                  ),
-                  child: const Text(
-                    "Reset",
-                    style: TextStyle(fontSize: 18),
                   ),
                 ),
 
-                const SizedBox(width: 10),
-
-                ElevatedButton(
-                  onPressed: stopwatch.isRunning ? addLap : null,
+                ElevatedButton.icon(
+                  onPressed: stopwatch.isRunning
+                      ? addLap
+                      : null,
+                  icon: const Icon(Icons.flag),
+                  label: const Text("Lap"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFD54F),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 25,
-                      vertical: 12,
-                    ),
-                  ),
-                  child: const Text(
-                    "Lap",
-                    style: TextStyle(fontSize: 18),
                   ),
                 ),
               ],
@@ -150,18 +162,35 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
 
             const SizedBox(height: 30),
 
-            if (laps.isNotEmpty)
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Laps",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            if (laps.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFFFFB300),
                   ),
                 ),
+                child: const Column(
+                  children: [
+                    Icon(
+                      Icons.flag_outlined,
+                      size: 40,
+                      color: Color(0xFFFFB300),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "No laps yet",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-
             const SizedBox(height: 10),
 
             Expanded(

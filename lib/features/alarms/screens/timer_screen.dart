@@ -58,7 +58,7 @@ class _TimerScreenState extends State<TimerScreen> {
       label: Text(
         "${minutes}m",
         style: const TextStyle(
-          color: Color(0xFF43A047),
+          color: Colors.black,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -66,7 +66,7 @@ class _TimerScreenState extends State<TimerScreen> {
         borderRadius: BorderRadius.circular(20),
         side: const BorderSide(color: Color(0xFFFFB300), width: 1.5),
       ),
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       onPressed: () {
         setState(() {
           initialSeconds = minutes * 60;
@@ -79,7 +79,7 @@ class _TimerScreenState extends State<TimerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E1),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text("Timer"),
         backgroundColor: Colors.transparent,
@@ -108,14 +108,14 @@ class _TimerScreenState extends State<TimerScreen> {
                   width: 245,
                   height: 245,
                   decoration: const BoxDecoration(
-                    color: const Color(0xFFFFF8E1),
+                    color: Colors.white,
                     shape: BoxShape.circle,
                   ),
                   child: Center(
                     child: Text(
                       formatTime(totalSeconds),
                       style: const TextStyle(
-                        color: Color(0xFF43A047),
+                        color: Colors.black,
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
                       ),

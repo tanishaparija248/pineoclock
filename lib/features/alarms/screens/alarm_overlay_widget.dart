@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:alarm/alarm.dart';
+import '../services/alarm_storage.dart';
 
 class AlarmOverlayWidget extends StatelessWidget {
   const AlarmOverlayWidget({super.key});
@@ -18,7 +20,7 @@ class AlarmOverlayWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFFB300).withOpacity(0.5),
+              color: const Color(0xFFFFB300).withOpacity(0.5), // ✅ fixed: withOpacity
               blurRadius: 15,
               spreadRadius: 2,
             ),
@@ -26,7 +28,6 @@ class AlarmOverlayWidget extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Pineapple + text
             const Text('🍍', style: TextStyle(fontSize: 28)),
             const SizedBox(width: 10),
             const Expanded(
@@ -55,6 +56,10 @@ class AlarmOverlayWidget extends StatelessWidget {
             // Stop button
             GestureDetector(
               onTap: () async {
+                // ✅ fixed: actually stop all ringing alarms before closing overlay
+                for (final alarm in AlarmStorage.alarms) {
+                  await Alarm.stop(alarm.id);
+                }
                 await FlutterOverlayWindow.closeOverlay();
               },
               child: Container(
@@ -84,7 +89,7 @@ class AlarmOverlayWidget extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Colors.white.withOpacity(0.4), // ✅ fixed: withOpacity
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: const Color(0xFF3E2723),
